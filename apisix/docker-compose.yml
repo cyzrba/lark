@@ -1,9 +1,8 @@
-version: "3.9"
-
 services:
   etcd:
     image: quay.io/coreos/etcd:v3.5.5 
     container_name: etcd
+    restart: unless-stopped
     ports:
       - "2379:2379"
     environment:
@@ -14,16 +13,17 @@ services:
       - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd:2380
       - ETCD_INITIAL_CLUSTER=etcd=http://etcd:2380
-      - ETCDCTL_API=3
     healthcheck:
-      test: ["CMD-SHELL", "etcdctl endpoint health --endpoints=http://127.0.0.1:2379 || exit 1"]
+      test: [ "CMD", "/usr/local/bin/etcdctl", "--endpoints=http://127.0.0.1:2379", "endpoint", "health" ]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 10
+      start_period: 5s
 
   apisix:
     image: apache/apisix:latest
     container_name: apisix
+    restart: unless-stopped
     depends_on:
       etcd:
         condition: service_healthy
@@ -37,6 +37,7 @@ services:
   apisix-dashboard:
     image: apache/apisix-dashboard:latest
     container_name: apisix-dashboard
+    restart: unless-stopped
     depends_on:
       etcd:
         condition: service_healthy

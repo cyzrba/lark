@@ -32,7 +32,7 @@ services:
       - "9180:9180"
       - "9443:9443"
     volumes:
-      - ./configs/apisix.conf:/usr/local/apisix/conf/config.yaml:ro
+      - ../configs/apisix/apisix.conf:/usr/local/apisix/conf/config.yaml:ro
 
   apisix-dashboard:
     image: apache/apisix-dashboard:latest
@@ -44,4 +44,4 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - ./configs/dashboard.conf:/usr/local/apisix-dashboard/conf/conf.yaml:ro
+      - ../configs/apisix/dashboard.conf:/usr/local/apisix-dashboard/conf/conf.yaml:ro

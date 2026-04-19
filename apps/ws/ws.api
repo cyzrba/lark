@@ -1,0 +1,15 @@
+syntax = "v1"
+
+type Request {
+	Name string `path:"name"`
+}
+
+type Response {
+	Message string `json:"message"`
+}
+
+service ws-api {
+	@handler WsUpgrade //处理函数的名称
+	get /ws/:name (Request) returns (Response)
+}
+

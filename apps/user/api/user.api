@@ -1,0 +1,30 @@
+syntax = "v1"
+
+type RegisterRequest {
+	Name     string `json:"name"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
+type RegisterResponse {
+	Id int `json:"id"`
+}
+
+type UserInfoRequest {
+	Id int `json:"id"`
+}
+
+type UserInfoResponse {
+	Name     string `json:"name"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
+service user-api {
+	@handler Register
+	post /user/register (RegisterRequest) returns (RegisterResponse)
+
+	@handler GetUserInfo
+	get /user/:id (UserInfoRequest) returns (UserInfoResponse)
+}
+

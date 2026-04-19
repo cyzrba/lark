@@ -1,0 +1,28 @@
+# Go
+bin/
+dist/
+build/
+coverage.out
+*.coverprofile
+*.test
+
+# Go caches
+.gocache/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

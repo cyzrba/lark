@@ -3,22 +3,56 @@
 
 package types
 
+type GetMyProfileRequest struct {
+	Authorization string `header:"Authorization"`
+}
+
+type GetMyProfileResponse struct {
+	User UserProfile `json:"user"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	Token     string `json:"token"`
+	ExpiresAt int64  `json:"expires_at"`
+}
+
 type RegisterRequest struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
+	Phone    string `json:"phone,optional"`
 }
 
 type RegisterResponse struct {
-	Id int `json:"id"`
+	User UserProfile `json:"user"`
 }
 
-type UserInfoRequest struct {
-	Id int `json:"id"`
+type UpdateMyProfileRequest struct {
+	Authorization string `header:"Authorization"`
+	Name          string `json:"name,optional"`
+	Email         string `json:"email,optional"`
+	Phone         string `json:"phone,optional"`
+	Status        int8   `json:"status,optional"`
+	UpdateStatus  bool   `json:"update_status,optional"`
+	OldPassword   string `json:"old_password,optional"`
+	NewPassword   string `json:"new_password,optional"`
 }
 
-type UserInfoResponse struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
+type UpdateMyProfileResponse struct {
+	User UserProfile `json:"user"`
+}
+
+type UserProfile struct {
+	Uid       int64  `json:"uid"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Status    int8   `json:"status"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }

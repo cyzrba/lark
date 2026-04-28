@@ -1,3 +1,13 @@
 Name: user-api
 Host: 0.0.0.0
-Port: 8888
+Port: 9001
+
+UserRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: user.rpc
+
+JwtAuth:
+  access_secret: "123456"
+  access_expire: 604800

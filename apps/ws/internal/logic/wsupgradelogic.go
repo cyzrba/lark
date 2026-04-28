@@ -35,6 +35,7 @@ func (l *WsUpgradeLogic) WsUpgrade(req *types.Request, w http.ResponseWriter, r 
 		return nil, err
 	}
 	c := client.NewClient(
+		
 		req.Name,
 		conn, 
 		l.svcCtx.MsgServer,

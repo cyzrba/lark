@@ -2,23 +2,31 @@ package client
 
 import (
 	"sync"
+	"time"
 
-	"lark/apps/ws/internal/types"
+	pb "lark/pkg/proto/pb/ws"
 
 	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
+const(
+	READTIMEOUT = 300000 * time.Second
+)
 
 type Hub interface {
 	RemoveClient(string)
-	SubmitMsg(types.ReadMsg)
+	SubmitMsg(*pb.Packet)
 }
 
 type Client struct {
+	Uuid 		string
+	UserId 		string
 	Name 		string
+	LoginTime 	time.Time
 	Conn 		*websocket.Conn
 	Server 		Hub
-	Writechan 	chan types.WriteMsg
+	Writechan 	chan *pb.Packet
 	ClosedSignal chan struct{}
 	CloseOnce   sync.Once
 
@@ -29,7 +37,7 @@ func NewClient(name string, conn *websocket.Conn, server Hub) *Client {
 		Name: name,
 		Conn: conn,
 		Server: server,
-		Writechan: make(chan types.WriteMsg, 10),
+		Writechan: make(chan *pb.Packet, 10),
 		ClosedSignal: make(chan struct{}),
 	}
 }
@@ -50,34 +58,45 @@ func (c *Client) Write() {
 		case <-c.ClosedSignal:
 			return
 		case msg := <-c.Writechan:
-		err := c.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Name + ": " + msg.Msg))
-		if err != nil {
-			c.Close()
-			return
-		}
+			data,err := proto.Marshal(msg)
+			if err != nil {
+				return
+			}
+			err = c.Conn.WriteMessage(websocket.BinaryMessage, data)
+			if err != nil {
+				c.Close()
+				return
+			}
 		}
 	}
 }
 
 func (c *Client) Read() {
 	defer c.Close()
+	c.Conn.SetReadDeadline(time.Now().Add(READTIMEOUT))
 	for {
 		messageType, payload, err := c.Conn.ReadMessage()
 		if err != nil {
 			return
 		}
+		c.Conn.SetReadDeadline(time.Now().Add(READTIMEOUT))
+		
 		if messageType != websocket.TextMessage && messageType != websocket.BinaryMessage {
 			continue
 		}
-		c.Server.SubmitMsg(types.ReadMsg{
-			Name: c.Name,
-			Msg:  string(payload),
-		})
+		var msg pb.Packet
+		if err := proto.Unmarshal(payload, &msg); err != nil {
+			return
+		}
+		
+		switch msg.Command {
+			case pb.
+		}
 
 	}
 } 
 
-func (c *Client) Send(msg types.WriteMsg) {
+func (c *Client) Send(msg *pb.Packet) {
 	select {
 	case <- c.ClosedSignal:
 		return

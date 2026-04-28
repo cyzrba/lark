@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package ws;
+option go_package = "lark/apps/ws/internal/pb;pb";
+
+// 极简版消息包装器
+message Message {
+  string request_id = 1; 
+  
+  // 核心：只保留聊天和错误反馈（测试时报错也很重要）
+  oneof payload {
+    ChatMessage chat = 2;
+    ErrorMessage error = 3;
+    HeartbeatPing heartbeat_ping = 4;
+    HeartbeatPong heartbeat_pong = 5;
+  }
+}
+
+message ChatMessage {
+  string from = 1;    // 发送者 ID
+  string to = 2;      // 接收者 ID
+  string content = 3; // 消息文本
+}
+
+message ErrorMessage {
+  int32 code = 1;
+  string message = 2;
+}
+
+message HeartbeatPing {
+  int64 client_unix_time = 1;
+}
+
+message HeartbeatPong {
+  string ack_request_id = 1;
+  int64 server_unix_time = 2;
+}

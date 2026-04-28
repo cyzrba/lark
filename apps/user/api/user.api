@@ -1,30 +1,70 @@
 syntax = "v1"
 
+type UserProfile {
+	Uid       int64  `json:"uid"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Status    int8   `json:"status"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
 type RegisterRequest {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
+	Phone    string `json:"phone,optional"`
 }
 
 type RegisterResponse {
-	Id int `json:"id"`
+	User UserProfile `json:"user"`
 }
 
-type UserInfoRequest {
-	Id int `json:"id"`
-}
-
-type UserInfoResponse {
-	Name     string `json:"name"`
-	Password string `json:"password"`
+type LoginRequest {
 	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse {
+	Token     string `json:"token"`
+	ExpiresAt int64  `json:"expires_at"`
+}
+
+type GetMyProfileRequest {
+	Authorization string `header:"Authorization"`
+}
+
+type GetMyProfileResponse {
+	User UserProfile `json:"user"`
+}
+
+type UpdateMyProfileRequest {
+	Authorization string `header:"Authorization"`
+	Name          string `json:"name,optional"`
+	Email         string `json:"email,optional"`
+	Phone         string `json:"phone,optional"`
+	Status        int8   `json:"status,optional"`
+	UpdateStatus  bool   `json:"update_status,optional"`
+	OldPassword   string `json:"old_password,optional"`
+	NewPassword   string `json:"new_password,optional"`
+}
+
+type UpdateMyProfileResponse {
+	User UserProfile `json:"user"`
 }
 
 service user-api {
 	@handler Register
 	post /user/register (RegisterRequest) returns (RegisterResponse)
 
-	@handler GetUserInfo
-	get /user/:id (UserInfoRequest) returns (UserInfoResponse)
+	@handler Login
+	post /user/login (LoginRequest) returns (LoginResponse)
+
+	@handler GetMyProfile
+	get /user/me (GetMyProfileRequest) returns (GetMyProfileResponse)
+
+	@handler UpdateMyProfile
+	put /user/me (UpdateMyProfileRequest) returns (UpdateMyProfileResponse)
 }
 

@@ -1,0 +1,7 @@
+exit
+db.messages.find()
+show collections
+use lark_chat
+show dbs
+exit
+show dbs

@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package lark.common;
+
+option go_package = "lark/pkg/proto/pb/common;pb_common";
+
+//会话类型
+enum ConversationType {
+  CONVERSATION_TYPE_UNSPECIFIED = 0;
+  CONVERSATION_TYPE_SINGLE = 1; //单聊
+}
+
+enum MessageType {
+  MESSAGE_TYPE_UNSPECIFIED = 0;
+  MESSAGE_TYPE_TEXT = 1;
+  MESSAGE_TYPE_IMAGE = 2;
+  MESSAGE_TYPE_FILE = 3;
+  MESSAGE_TYPE_SYSTEM = 4;
+}
+
+enum MessageStatus {
+  MESSAGE_STATUS_UNSPECIFIED = 0;
+  MESSAGE_STATUS_SENT = 1;
+  MESSAGE_STATUS_DELIVERED = 2;
+  MESSAGE_STATUS_READ = 3;
+  MESSAGE_STATUS_RECALLED = 4;
+  MESSAGE_STATUS_DELETED = 5;
+}
+
+message Conversation {
+  string conversation_id = 1;
+  ConversationType conversation_type = 2;
+  repeated string member_ids = 3; // 单聊时固定两个
+  int64 max_seq = 4;
+  int64 created_at = 5;
+  int64 updated_at = 6;
+}
+
+message TextContent {
+  string text = 1;
+}
+
+message ImageContent {
+  string url = 1;
+  int32 width = 2;
+  int32 height = 3;
+  int64 size = 4;
+}
+
+message FileContent {
+  string url = 1;
+  string file_name = 2;
+  int64 size = 3;
+  string mime_type = 4;
+}
+
+message MessageBody {
+  oneof content {
+    TextContent text = 1;
+    ImageContent image = 2;
+    FileContent file = 3;
+  }
+}
+
+message ChatMessage {
+  string message_id = 1; //服务端生成，落库主键
+  string client_msg_id = 2; //客户端生成，防重试
+  string conversation_id = 3;
+  string sender_id = 4;
+  MessageType message_type = 5;
+  MessageBody body = 6;
+
+  int64 seq = 7; //会话内严格递增
+  MessageStatus status = 8;
+  int64 send_time = 9;
+  int64 edit_time = 10;
+  int64 recall_time = 11;
+
+}
+
+message MessageReceipt {
+    string message_id = 1;
+    string conversation_id = 2;
+    string user_id = 3;
+    int64 delivered_seq = 4;
+    int64 read_seq = 5;
+    int64 operate_time=6;
+}

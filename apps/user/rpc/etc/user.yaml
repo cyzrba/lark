@@ -1,0 +1,13 @@
+# user.rpc是服务发现(etcd)的标识符
+Name: user.rpc
+ListenOn: 0.0.0.0:9002
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: user.rpc
+
+database:
+  driver: mysql
+  source: "root:123456@tcp(127.0.0.1:3306)/im?charset=utf8mb4&parseTime=True&loc=Local"
+  max_idle_conns: 10
+  max_open_conns: 100

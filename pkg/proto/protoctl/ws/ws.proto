@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package lark.ws;
+
+option go_package = "lark/pkg/proto/pb/ws;pb_ws";
+
+import "common/message.proto";
+
+message Packet {
+    string request_id = 1;
+    Command command = 2;
+    string device_id = 3;
+    int64 client_time = 4;
+
+    oneof payload {
+        SendMessage send_message = 10;
+        SendAck send_ack = 11;
+        MessageEvent message_event = 12;
+        SyncRequest sync_request = 13;
+        SyncResponse sync_response = 14;
+        ReadRequest read_request = 15;
+        RecallRequest recall_request = 16;
+        HeartbeatPing ping = 17;
+        HeartbeatPong pong = 18;
+        ErrorResponse error = 19;
+    }
+}
+
+
+
+enum Command {
+    COMMAND_UNSPECIFIED = 0; 
+    COMMAND_SEND_MESSAGE = 1; //客户端发信息的命令 
+    COMMAND_MESSAGE_ACK = 2; //检查信息是否有落库的命令
+    COMMAND_MESSAGE_EVENT = 3; //客户端收信息的命令
+    COMMAND_SYNC = 4; //客户端断网重连后解决漏信的命令
+    COMMAND_SYNC_RESULT = 5; 
+    COMMAND_READ = 6; //客户端已读的命令
+    COMMAND_RECALL = 7; //客户端撤回的命令
+    COMMAND_HEARTBEAT_PING = 8; //心跳检测
+    COMMAND_HEARTBEAT_PONG = 9;
+    COMMAND_ERROR = 10; //服务端发送错误的命令
+}
+
+message SendMessage {
+    string conversion_id = 1;
+    string client_msg_id = 2;
+    lark.common.MessageType message_type = 3;
+    lark.common.MessageBody body = 4;
+}
+
+message SendAck {
+    string conversation_id = 1;
+    string client_msg_id = 2;
+    string message_id = 3;
+    int64 seq = 4;
+    int64 send_time = 5;
+}
+
+enum MessageEventType {
+  MESSAGE_EVENT_TYPE_UNSPECIFIED = 0;
+  MESSAGE_EVENT_TYPE_NEW = 1;
+  MESSAGE_EVENT_TYPE_DELIVERED = 2;
+  MESSAGE_EVENT_TYPE_READ = 3;
+  MESSAGE_EVENT_TYPE_RECALLED = 4;
+  MESSAGE_EVENT_TYPE_EDITED = 5;
+}
+
+message MessageEvent {
+  MessageEventType event_type = 1;
+  lark.common.ChatMessage message = 2;
+  lark.common.MessageReceipt receipt = 3;
+}
+
+message SyncRequest {
+  string conversation_id = 1;
+  int64 after_seq = 2;
+  int32 limit = 3;
+}
+
+message SyncResponse {
+  string conversation_id = 1;
+  repeated lark.common.ChatMessage messages = 2;
+  int64 next_seq = 3;
+  bool has_more = 4;
+}
+
+message ReadRequest {
+  string conversation_id = 1;
+  int64 read_seq = 2;
+}
+
+message RecallRequest {
+  string conversation_id = 1;
+  string message_id = 2;
+}
+
+message HeartbeatPing {
+  int64 client_unix_time = 1;
+}
+
+message HeartbeatPong {
+  string ack_request_id = 1;
+  int64 server_unix_time = 2;
+}
+
+message ErrorResponse {
+  int32 code = 1;
+  string message = 2;
+  string request_id = 3;
+}

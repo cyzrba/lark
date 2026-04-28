@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package lark.chat;
+
+option go_package = "lark/pkg/proto/pb/chat;pb_chat";
+
+import "common/message.proto";
+
+service ChatRpc {
+  rpc SendMessage(SendMessageReq) returns (SendMessageResp);
+}
+
+message SendMessageReq {
+  string request_id = 1;
+  string operator_id = 2;      // 当前发起人
+  string conversation_id = 3;
+  string client_msg_id = 4;
+  lark.common.MessageType message_type = 5;
+  lark.common.MessageBody body = 6;
+}
+
+message SendMessageResp {
+  lark.common.ChatMessage message = 1;
+}
